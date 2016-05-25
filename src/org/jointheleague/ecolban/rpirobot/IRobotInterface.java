@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * A high level interface to the iRobot series of Roomba/Create robots. It
  * encapsulates most of the commands and sensors specified in <a href=
- * "http://www.irobot.com/~/media/MainSite/PDFs/About/STEM/Create/iRobot_Roomba_600_Open_Interface_Spec_0512.pdf"
+ * "https://cdn-shop.adafruit.com/datasheets/create_2_Open_Interface_Spec.pdf"
  * > iRobot Create 2 Open Interface (OI)</a>. It is recommended reading that
  * document in order to get a better understanding of how to work with the
  * iRobot.
