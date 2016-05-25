@@ -332,6 +332,7 @@ public final class SimpleIRobot implements IRobotInterface {
 
     }
 
+    @Override
     public synchronized void drive(int velocity, int radius) throws IOException {
         serialConnection.writeByte(COMMAND_DRIVE);
         serialConnection.writeSignedWord(velocity);
@@ -342,6 +343,7 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public synchronized void driveDirect(int leftVelocity, int rightVelocity) throws IOException {
         serialConnection.writeByte(COMMAND_DRIVE_DIRECT);
         serialConnection.writeSignedWord(rightVelocity);
@@ -352,6 +354,7 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public synchronized void full() throws IOException {
         serialConnection.writeByte(COMMAND_MODE_FULL);
         try {
@@ -360,86 +363,107 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public synchronized int getAngle() {
         return angle;
     }
 
+    @Override
     public synchronized int getBatteryCapacity() {
         return batteryCapacity;
     }
 
+    @Override
     public synchronized int getBatteryCharge() {
         return batteryCharge;
     }
 
+    @Override
     public synchronized int getBatteryTemperature() {
         return batteryTemperature;
     }
 
+    @Override
     public synchronized int getChargingState() {
         return chargingState;
     }
 
+    @Override
     public synchronized int getCliffSignalLeftFront() {
         return cliffSignalLeftFront;
     }
 
+    @Override
     public synchronized int getCliffSignalRightFront() {
         return cliffSignalRightFront;
     }
 
+    @Override
     public synchronized int getCliffSignalLeft() {
         return cliffSignalLeft;
     }
 
+    @Override
     public synchronized int getCliffSignalRight() {
         return cliffSignalRight;
     }
 
+    @Override
     public synchronized int getCurrent() {
         return current;
     }
 
+    @Override
     public synchronized int getDistance() {
         return distance;
     }
 
+    @Override
     public int getEncoderCountLeft() {
         return encoderCountLeft;
     }
 
+    @Override
     public int getEncoderCountRight() {
         return encoderCountRight;
     }
 
+    @Override
     public synchronized int getInfraredByte() {
         return infraredByte;
     }
 
+    @Override
     public int getInfraredByteLeft() {
         return infraredByteLeft;
     }
 
+    @Override
     public int getInfraredByteRight() {
         return infraredByteRight;
     }
 
+    @Override
     public synchronized int getOiMode() {
         return oiMode;
     }
 
+    @Override
     public synchronized int getRequestedVelocityLeft() {
         return requestedVelocityLeft;
     }
 
+    @Override
     public synchronized int getRequestedRadius() {
         return requestedRadius;
     }
 
+    @Override
     public synchronized int getRequestedVelocityRight() {
         return requestedVelocityRight;
     }
 
+    @Override
     public synchronized int getRequestedVelocity() {
         return requestedVelocity;
     }
@@ -452,10 +476,12 @@ public final class SimpleIRobot implements IRobotInterface {
     // return sensorValues[sensorId];
     // }
 
+    @Override
     public synchronized int getSongNumber() {
         return songNumber;
     }
 
+    @Override
     public synchronized int getVoltage() {
         return voltage;
     }
@@ -475,14 +501,17 @@ public final class SimpleIRobot implements IRobotInterface {
         return stasis;
     }
 
+    @Override
     public synchronized int getWallSignal() {
         return wallSignal;
     }
 
+    @Override
     public synchronized boolean isBumpLeft() {
         return bumpLeft;
     }
 
+    @Override
     public synchronized boolean isBumpRight() {
         return bumpRight;
     }
@@ -505,70 +534,87 @@ public final class SimpleIRobot implements IRobotInterface {
         return result;
     }
 
+    @Override
     public synchronized boolean isCliffFrontLeft() {
         return cliffFrontLeft;
     }
 
+    @Override
     public synchronized boolean isCliffFrontRight() {
         return cliffFrontRight;
     }
 
+    @Override
     public synchronized boolean isCliffLeft() {
         return cliffLeft;
     }
 
+    @Override
     public synchronized boolean isCliffRight() {
         return cliffRight;
     }
 
+    @Override
     public synchronized boolean isHomeBaseChargerAvailable() {
         return homeBaseChargerAvailable;
     }
 
+    @Override
     public synchronized boolean isInternalChargerAvailable() {
         return internalChargerAvailable;
     }
 
+    @Override
     public synchronized boolean isLeftWheelOvercurrent() {
         return wheelOvercurrentLeft;
     }
 
+    @Override
     public synchronized boolean isWheelOvercurrentSideBrush() {
         return wheelOvercurrentSideBrush;
     }
 
+    @Override
     public synchronized boolean isWheelOvercurrentMainBrush() {
         return wheelOvercurrentMainBrush;
     }
 
+    @Override
     public synchronized boolean isRightWheelOvercurrent() {
         return wheelOvercurrentRight;
     }
 
+    @Override
     public synchronized boolean isSongPlaying() {
         return songPlaying;
     }
 
+    @Override
     public synchronized boolean isSpotButtonDown() {
         return (buttons & SPOT_BUTTON_LED_ID) != 0;
     }
 
+    @Override
     public synchronized boolean isVirtualWall() {
         return virtualWall;
     }
 
+    @Override
     public synchronized boolean isWall() {
         return wall;
     }
 
+    @Override
     public synchronized boolean isWheelDropLeft() {
         return wheelDropLeft;
     }
 
+    @Override
     public synchronized boolean isWheelDropRight() {
         return wheelDropRight;
     }
 
+    @Override
     public synchronized void leds(int powerColor, int powerIntensity, boolean spotLedOn) throws IOException {
         serialConnection.writeByte(COMMAND_LEDS);
         serialConnection.writeByte(spotLedOn ? SPOT_BUTTON_LED_ID : 0);
@@ -583,6 +629,7 @@ public final class SimpleIRobot implements IRobotInterface {
         isSpotLedOn = spotLedOn;
     }
 
+    @Override
     public synchronized void ledsToggle(boolean togglePower) throws IOException {
         if (togglePower) {
             powerLedIntensity = powerLedIntensity ^ 0xFF;
@@ -591,6 +638,7 @@ public final class SimpleIRobot implements IRobotInterface {
         leds(powerLedColor, powerLedIntensity, isSpotLedOn);
     }
 
+    @Override
     public synchronized void playSong(int songNumber) throws IOException {
         serialConnection.writeByte(COMMAND_PLAY_SONG);
         serialConnection.writeByte(songNumber);
@@ -600,6 +648,7 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public synchronized void readSensors(int sensorId) throws IOException {
         serialConnection.writeByte(COMMAND_SENSORS);
         serialConnection.writeByte(sensorId);
@@ -611,8 +660,14 @@ public final class SimpleIRobot implements IRobotInterface {
     }
 
     private void saveSensorData(int sensorId) throws IOException {
-        int low = sensorGroupLow.getOrDefault(sensorId, sensorId);
-        int high = sensorGroupHigh.getOrDefault(sensorId, sensorId);
+    	int low = sensorId;
+    	if(sensorGroupLow.containsKey(sensorId)) {
+    		low = sensorGroupLow.get(sensorId);
+    	}
+        int high = sensorId;
+        if(sensorGroupHigh.containsKey(sensorId)) {
+    		high = sensorGroupLow.get(sensorId);
+    	}
         for (int i = low; i <= high; i++) {
             saveSensorDataPrim(i);
         }
@@ -804,6 +859,7 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public synchronized void reset() throws IOException {
         serialConnection.writeByte(COMMAND_RESET);
         try {
@@ -812,6 +868,7 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public synchronized void safe() throws IOException {
         serialConnection.writeByte(COMMAND_MODE_SAFE);
         try {
@@ -820,10 +877,12 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public synchronized void song(int songNumber, int[] notesAndDurations) throws IOException {
         song(songNumber, notesAndDurations, 0, notesAndDurations.length);
     }
 
+    @Override
     public synchronized void song(int songNumber, int[] notesAndDurations, int startIndex, int length)
             throws IOException {
         if (songNumber < 0 || songNumber > 15) {
@@ -845,6 +904,7 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public void stop() throws IOException {
         serialConnection.writeByte(COMMAND_STOP);
         try {
@@ -853,6 +913,7 @@ public final class SimpleIRobot implements IRobotInterface {
         }
     }
 
+    @Override
     public synchronized void waitButtonPressed(boolean beep) throws IOException {
         int startingPowerLedIntensity = powerLedIntensity;
         int startingPowerLedColor = powerLedColor;
@@ -887,6 +948,7 @@ public final class SimpleIRobot implements IRobotInterface {
         leds(startingPowerLedColor, startingPowerLedIntensity, startingSpotLedState);
     }
 
+    @Override
     public void closeConnection() {
         if (serialConnection != null) {
             serialConnection.close();

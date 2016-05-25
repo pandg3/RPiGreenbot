@@ -492,6 +492,22 @@ public interface IRobotInterface {
      * Identifies the stasis sensor.
      */
     int SENSORS_STASIS = 58;
+     
+    /**
+     * The distance between the two wheels
+     */
+    double WHEEL_DISTANCE = 235.0; // in mm
+    
+    /**
+     * The wheel diameter
+     */
+    double WHEEL_DIAMETER = 72.0; // in mm
+    
+    /**
+     * The number of encoder counts per revolution
+     */
+    double ENCODER_COUNTS_PER_REVOLUTION = 508.8;
+
 
     /**
      * Controls the iRobot's drive wheels. Larger values for the radius makes
@@ -1178,7 +1194,18 @@ public interface IRobotInterface {
     boolean isLeftWheelOvercurrent();
 
     /**
-     * Gets the state of the light bump.
+     * Returns a non-zero value if a light bump is detected. The returned value is a bitmap of the
+     * light bumps detected:
+     * <ul>
+     *  <li> Bit 0: Left
+     *  <li> Bit 1: Front left
+     *  <li> Bit 2: Center left
+     *  <li> Bit 3: Center right
+     *  <li> Bit 4: Front right
+     *  <li> Bit 5: Right
+     * </ul> 
+     * <p>
+     * Use {@link #getLightBumps()} to check the strengths of the light bumbs. 
      * <p/>
      * <b>NOTE:</b> This method returns a locally stored value previously read
      * from the iRobot. It is the client's responsibility to read the sensor
@@ -1296,7 +1323,9 @@ public interface IRobotInterface {
      */
     boolean isWheelDropRight();
 
-    /**
+    boolean isWheelOvercurrentSideBrush();
+
+	/**
      * This method controls the LEDs on the iRobot. The state of the Play and
      * Advance LEDs is specified by true or false. The Power LED is specified by
      * two values: one for the color and the other for the intensity. Available
@@ -1318,7 +1347,9 @@ public interface IRobotInterface {
      */
     void leds(int powerColor, int powerIntensity, boolean spotLedOn) throws IOException;
 
-    /**
+    void ledsToggle(boolean togglePower) throws IOException;
+
+	/**
      * Selects a song to play from the songs previously added to the iRobot
      * using one of the song() methods. This method does nothing if a song is
      * already playing. Note that the {@link #isSongPlaying() isSongPlaying()}
