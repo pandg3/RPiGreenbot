@@ -188,6 +188,11 @@ import java.io.IOException;
     }
 
     @Override
+	public boolean isCleanButtonDown() {
+		return delegate.isCleanButtonDown();
+	}
+
+	@Override
     public boolean isHomeBaseChargerAvailable() {
         return delegate.isHomeBaseChargerAvailable();
     }

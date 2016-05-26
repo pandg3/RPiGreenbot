@@ -9,6 +9,8 @@ import java.io.IOException;
  * > iRobot Create 2 Open Interface (OI)</a>. It is recommended reading that
  * document in order to get a better understanding of how to work with the
  * iRobot.
+ * 
+ * @author Erik Colban &copy; 2016
  */
 public interface IRobotInterface {
 
@@ -1113,7 +1115,20 @@ public interface IRobotInterface {
      */
     boolean isBumpRight();
 
-    boolean isCliffFrontLeft();
+    /**
+     * Gets the state of the Clean button
+     * <p/>
+     * <b>NOTE:</b> This method returns a locally stored value previously read
+     * from the iRobot. It is the client's responsibility to read the sensor
+     * values from the iRobot prior to calling this method in order to ensure
+     * fresh values.
+     *
+     * @return true if the Spot button is depressed.
+     * @see #readSensors(int sensorId)
+     */
+    boolean isCleanButtonDown();
+
+	boolean isCliffFrontLeft();
 
     /**
      * Gets the state of the front right cliff sensor.
