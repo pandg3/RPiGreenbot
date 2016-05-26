@@ -1,3 +1,4 @@
+
 package org.jointheleague.ecolban.rpirobot;
 
 import java.io.IOException;
@@ -6,6 +7,8 @@ import java.io.IOException;
  * A concrete class that provides a default implementation of the
  * IRobotInterface. It is a convenience class intended to be extended in order
  * to define customized implementations of the IRobotInterface.
+ * 
+ * @author Erik Colban &copy; 2016
  */
     public class IRobotAdapter implements IRobotInterface {
 
