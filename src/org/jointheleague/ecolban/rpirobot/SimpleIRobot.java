@@ -295,13 +295,13 @@ public final class SimpleIRobot implements IRobotInterface {
 					} catch (InterruptedException e) {
 					}
 					try {
-						readSensors(SENSORS_GROUP_ID2);
+						readSensors(SENSORS_BUTTONS);
 					} catch (IOException e) {
 						System.out.println(e.getMessage());
 					}
-					System.out.println("Spot button sensor read.");
+//					System.out.println("Spot button sensor read.");
 					if (isSpotButtonDown()) {
-						System.out.println("Spot button down.");
+//						System.out.println("Spot button down.");
 						try {
 							stop();
 						} catch (IOException e) {
@@ -315,7 +315,7 @@ public final class SimpleIRobot implements IRobotInterface {
 		});
 		spotListener.setDaemon(true);
 		spotListener.start();
-		System.out.println("Spot listener started.");
+//		System.out.println("Spot listener started.");
 	}
 
 	private void buildSensorGroups() {
