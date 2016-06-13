@@ -1,6 +1,7 @@
 package org.jointheleague.ecolban.rpirobot;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -681,7 +682,7 @@ public final class SimpleIRobot implements IRobotInterface {
 		}
 		int high = sensorId;
 		if (sensorGroupHigh.containsKey(sensorId)) {
-			high = sensorGroupLow.get(sensorId);
+			high = sensorGroupHigh.get(sensorId);
 		}
 		for (int i = low; i <= high; i++) {
 			saveSensorDataPrim(i);
