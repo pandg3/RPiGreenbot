@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/RXTXcomm.jar">
+	<classpathentry kind="lib" path="/Users/erikcolban/javalib/pi4j-1.1/lib/pi4j-core.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="RPiGreenbot/lib"/>
+			<attribute name="javadoc_location" value="jar:file:/Users/erikcolban/javalib/pi4j-1.1/lib/pi4j-core-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
