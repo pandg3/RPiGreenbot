@@ -2,10 +2,13 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/erikcolban/javalib/pi4j-1.1/lib/pi4j-core.jar">
+	<classpathentry kind="lib" path="lib/pi4j-core.jar" sourcepath="lib/pi4j-core-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/Users/erikcolban/javalib/pi4j-1.1/lib/pi4j-core-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/RPiGreenbot/lib/pi4j-core-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/pi4j-device.jar"/>
+	<classpathentry kind="lib" path="lib/pi4j-gpio-extension.jar"/>
+	<classpathentry kind="lib" path="lib/pi4j-service.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

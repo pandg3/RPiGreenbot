@@ -15,12 +15,11 @@ import com.pi4j.io.serial.SerialDataEventListener;
 import com.pi4j.io.serial.SerialFactory;
 import com.pi4j.io.serial.SerialPort;
 import com.pi4j.io.serial.StopBits;
+import com.pi4j.system.SystemInfo.BoardType;
 
 /**
- * This class represents the communication channel between the computer (e.g.,
- * Raspberry Pi) and the iRobot. At most one instance of this class may be
- * instantiated. Use the {@link #getInstance(boolean) } method to get that
- * instance.
+ * This class represents the communication channel between the computer (e.g., Raspberry Pi) and the iRobot. At most one
+ * instance of this class may be instantiated. Use the {@link #getInstance(boolean) } method to get that instance.
  * 
  * @author Erik Colban &copy; 2016
  * 
@@ -32,9 +31,8 @@ public final class SerialConnection {
 	private static final int SENSOR_COMMAND = 142;
 	private static final Baud BAUD_RATE = Baud._115200;
 	private Serial serial;
-	private boolean debug = false;
-	private ByteBuffer readBuffer = ByteBuffer.allocate(128);
-	private ByteBuffer writeBuffer = ByteBuffer.allocate(128);
+	private boolean debug = true;
+	private byte[] writeBuffer = new byte[128];
 	// operations
 	private static final int MAX_COMMAND_SIZE = 26; // max number of bytes that
 													// can be sent in 15 ms at
@@ -43,12 +41,12 @@ public final class SerialConnection {
 													// first command sent.
 
 	// Constructor of a serial connection between the iRobot and the IOIO board
-	private SerialConnection()  {
-		
+	private SerialConnection() {
+
 	}
-	
+
 	static SerialConnection theConnection = new SerialConnection();
-	
+
 	public static SerialConnection getInstance() throws IOException, InterruptedException {
 		theConnection.initialize();
 		return theConnection;
@@ -56,60 +54,30 @@ public final class SerialConnection {
 
 	private void initialize() throws IOException, InterruptedException {
 		serial = SerialFactory.createInstance();
-		readBuffer.position(0);
-		readBuffer.mark(); // Set mark a position 0
-		writeBuffer.position(0);
-		writeBuffer.mark();
 
-		// create and register the serial data listener
-		serial.addListener(new SerialDataEventListener() {
-			@Override
-			public void dataReceived(SerialDataEvent event) {
+		// create serial config object
+		SerialConfig config = new SerialConfig();
 
-				// NOTE! - It is extremely important to read the data received
-				// from the
-				// serial port. If it does not get read from the receive buffer,
-				// the
-				// buffer will continue to grow and consume memory.
+		// set default serial settings (device, baud rate, flow control,
+		// etc)
+		//
+		// by default, use the DEFAULT com port on the Raspberry Pi (exposed
+		// on GPIO header)
+		// NOTE: this utility method will determine the default serial port
+		// for the
+		// detected platform and board/model. For all Raspberry Pi models
+		// except the 3B, it will return "/dev/ttyAMA0". For Raspberry Pi
+		// model 3B may return "/dev/ttyS0" or "/dev/ttyAMA0" depending on
+		// environment configuration.
+		config.device(SerialPort.getDefaultPort(BoardType.RaspberryPi_2B)).baud(BAUD_RATE).dataBits(DataBits._8).parity(Parity.NONE).stopBits(StopBits._1)
+				.flowControl(FlowControl.NONE);
 
-				// print out the data received to the console
-				try {
-					readBuffer.reset();
-					serial.read(readBuffer);
-				} catch (IOException e) {
-					System.out.println(e.toString());
-				}
-			}
-		});
+		System.out.println("config = " + config);
 
-		try {
-			// create serial config object
-			SerialConfig config = new SerialConfig();
+		serial.open(config);
 
-			// set default serial settings (device, baud rate, flow control,
-			// etc)
-			//
-			// by default, use the DEFAULT com port on the Raspberry Pi (exposed
-			// on GPIO header)
-			// NOTE: this utility method will determine the default serial port
-			// for the
-			// detected platform and board/model. For all Raspberry Pi models
-			// except the 3B, it will return "/dev/ttyAMA0". For Raspberry Pi
-			// model 3B may return "/dev/ttyS0" or "/dev/ttyAMA0" depending on
-			// environment configuration.
-			config.device(SerialPort.getDefaultPort())
-					.baud(BAUD_RATE).dataBits(DataBits._8)
-					.parity(Parity.NONE)
-					.stopBits(StopBits._1)
-					.flowControl(FlowControl.NONE);
-
-			serial.open(config);
-
-			// display connection details
-			System.out.println(" Connecting to: " + config.toString());
-		} catch (IOException | UnsupportedBoardType | InterruptedException e) {
-			System.out.println(e.toString());
-		}
+		// display connection details
+		System.out.println("Connecting to: " + config.toString());
 
 		if (debug) {
 			System.out.println("Trying to connect.");
@@ -130,26 +98,26 @@ public final class SerialConnection {
 				Thread.sleep(2500);
 			}
 		}
+
 	}
 
 	/**
-	 * Gets a default serial connection to the iRobot. This method returns after
-	 * a connection between the IOIO and the iRobot has been established.
+	 * Gets a default serial connection to the iRobot. This method returns after a connection between the IOIO and the
+	 * iRobot has been established.
 	 * 
 	 * @param ioio
 	 *            the ioio instance used to connect to the iRobot
 	 * @param debug
-	 *            if true establishes a connection that prints out debugging
-	 *            information.
+	 *            if true establishes a connection that prints out debugging information.
 	 * @return a serial connection to the iRobot
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
 	public static SerialConnection getInstance(boolean debug) throws InterruptedException, IOException {
-		
-
+		System.out.println("Debugging = " + debug);
+		theConnection.initialize();
+		theConnection.debug = debug;
 		return theConnection;
-
 	}
 
 	// Sends the start command to the iRobot
@@ -158,20 +126,17 @@ public final class SerialConnection {
 		// final int numberOfStartsToSend = MAX_COMMAND_SIZE;
 		final int numberOfStartsToSend = 1;
 		for (int i = 0; i < numberOfStartsToSend; i++) {
-			writeBuffer.put((byte) COMMAND_START);
+			writeBuffer[i] = (byte) COMMAND_START;
 		}
-		writeBuffer.rewind();
-		serial.write(writeBuffer);
+		serial.write(writeBuffer, 0, numberOfStartsToSend);
 		if (debug) {
 			System.out.println("Waiting for the iRobot to get into passive mode");
 		}
 		boolean waitingForAckFromIRobot = true;
 		while (waitingForAckFromIRobot) {
-			writeBuffer.position(0);
-			writeBuffer.put((byte) SENSOR_COMMAND);
-			writeBuffer.put((byte) SENSORS_OI_MODE);
-			writeBuffer.rewind();
-			serial.write(writeBuffer);
+			writeBuffer[0] = (byte) SENSOR_COMMAND;
+			writeBuffer[1] = (byte) SENSORS_OI_MODE;
+			serial.write(writeBuffer, 0, 2);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -184,8 +149,7 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * The maximum number of bytes that can be transmitted in a command to the
-	 * iRobot
+	 * The maximum number of bytes that can be transmitted in a command to the iRobot
 	 * 
 	 * @return the max size in bytes
 	 */
@@ -204,8 +168,8 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Reads a byte received from the iRobot over the serial connection and
-	 * interprets it as a signed byte, i.e., value is in the range -128 - 127.
+	 * Reads a byte received from the iRobot over the serial connection and interprets it as a signed byte, i.e., value
+	 * is in the range -128 - 127.
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
@@ -213,7 +177,9 @@ public final class SerialConnection {
 	 * 
 	 */
 	public int readSignedByte() throws IOException {
-		int result = readBuffer.get();
+		byte[] buffer = serial.read();
+		assert buffer.length == 1;
+		int result = buffer[0];
 		if (debug) {
 			System.out.println(String.format("Read signed byte: %d", result));
 		}
@@ -221,15 +187,19 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Reads a byte received from the iRobot over the serial connection and
-	 * interprets it as an unsigned byte, i.e., value is in range 0 - 255.
+	 * Reads a byte received from the iRobot over the serial connection and interprets it as an unsigned byte, i.e.,
+	 * value is in range 0 - 255.
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
 	 * 
 	 */
 	public int readUnsignedByte() throws IOException {
-		int result = readBuffer.get() & 0xFF;
+		byte[] buffer = serial.read();
+		while (buffer.length < 1) {
+			buffer = serial.read();
+		}
+		int result = buffer[0] & 0xFF;
 		if (debug) {
 			System.out.println(String.format("Read unsigned byte: %d", result));
 		}
@@ -237,36 +207,41 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Reads 2 bytes received from the iRobot over the serial connection and
-	 * interprets them as a signed word, i.e., value is in range -32768 - 32767.
+	 * Reads 2 bytes received from the iRobot over the serial connection and interprets them as a signed word, i.e.,
+	 * value is in range -32768 - 32767.
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
 	 * 
 	 */
 	public int readSignedWord() throws IOException {
-		int signed = readBuffer.getShort();
+		byte[] buffer = serial.read();
+		assert buffer.length == 2;
+		int result = buffer[0] << 8 | buffer[1];
 		if (debug) {
-			System.out.println(String.format("Read signed word: %d", signed));
+			System.out.println(String.format("Read signed word: %d", result));
 		}
-		return signed;
+		return result;
 	}
 
 	/**
-	 * Reads 2 bytes received from the iRobot over the serial connection and
-	 * interprets them as an unsigned word, i.e., value is in range 0 - 65535.
+	 * Reads 2 bytes received from the iRobot over the serial connection and interprets them as an unsigned word, i.e.,
+	 * value is in range 0 - 65535.
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
 	 * 
 	 */
 	public int readUnsignedWord() throws IOException {
-		int unsigned = (int) readBuffer.getShort() & 0xFFFF; // 0 <= unsigned <=
-																// 0xFFFF
-		if (debug) {
-			System.out.println(String.format("Read unsigned word = %d", unsigned));
+		byte[] buffer = serial.read();
+		if (buffer.length < 2) {
+			buffer = serial.read();
 		}
-		return unsigned;
+		int result = (buffer[0] << 8 | buffer[1]) & 0xFFFF;
+		if (debug) {
+			System.out.println(String.format("Read unsigned word = %d", result));
+		}
+		return result;
 	}
 
 	/**
@@ -301,20 +276,14 @@ public final class SerialConnection {
 			System.out.println(String.format("Sending bytes byte[] length: %d", length));
 			for (int i = 0; i < length; i++) {
 				System.out.println(String.format("[%d] = %d", i, ints[start + i]));
+				writeBuffer[i] = (byte) ints[start + i];
 			}
 		}
-		writeBuffer.reset();
-		for (int i = 0; i < length; i++) {
-			writeBuffer.put((byte) ints[start + i]);
-		}
-		writeBuffer.limit(length);
-		writeBuffer.rewind();
-		serial.write(writeBuffer);
+		serial.write(writeBuffer, 0, length);
 	}
 
 	/**
-	 * Sends a signed word to the iRobot over the serial connection as two
-	 * bytes, high byte first.
+	 * Sends a signed word to the iRobot over the serial connection as two bytes, high byte first.
 	 * 
 	 * @param value
 	 *            an int in the range -32768 - 32767.
@@ -323,18 +292,16 @@ public final class SerialConnection {
 	 */
 	public void writeSignedWord(int value) throws IOException {
 		// Java bit representation is already two's complement
-		writeBuffer.reset();
-		writeBuffer.putShort((short) value);
-		writeBuffer.limit(2);
-		serial.write(writeBuffer);
+		writeBuffer[0] = (byte) (value >> 8);
+		writeBuffer[1] = (byte) (value & 0xFF);
+		serial.write(writeBuffer, 0, 2);
 		if (debug) {
 			System.out.println("Sending signed word: " + value);
 		}
 	}
 
 	/**
-	 * Sends an unsigned word to the iRobot over the serial connection as two
-	 * bytes, high byte first.
+	 * Sends an unsigned word to the iRobot over the serial connection as two bytes, high byte first.
 	 * 
 	 * @param value
 	 *            an int in the range 0 - 65535.
@@ -343,12 +310,11 @@ public final class SerialConnection {
 	 */
 	public void writeUnsignedWord(int value) throws IOException {
 		// Java bit representation is already two's complement
-		writeBuffer.reset();
-		writeBuffer.putShort((short) value);
-		writeBuffer.limit(2);
-		serial.write(writeBuffer);
+		writeBuffer[0] = (byte) (value >> 8);
+		writeBuffer[1] = (byte) (value & 0xFF);
+		serial.write(writeBuffer, 0, 2);
 		if (debug) {
-			System.out.println("Sending signed word: " + value);
+			System.out.println("Sending unsigned word: " + value);
 		}
 	}
 
@@ -359,13 +325,14 @@ public final class SerialConnection {
 		if (debug) {
 			System.out.println("Closing connection");
 		}
-		if(serial.isClosed()) return;
+		if (serial.isClosed())
+			return;
 		try {
 			serial.flush();
 			serial.close();
 		} catch (IllegalStateException | IOException e) {
 			System.out.println(e.toString());
 		}
-		
+
 	}
 }
