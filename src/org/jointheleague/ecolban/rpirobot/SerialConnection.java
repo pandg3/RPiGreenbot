@@ -1,9 +1,8 @@
 package org.jointheleague.ecolban.rpirobot;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 
-import com.pi4j.io.gpio.exception.UnsupportedBoardType;
 import com.pi4j.io.serial.Baud;
 import com.pi4j.io.serial.DataBits;
 import com.pi4j.io.serial.FlowControl;
@@ -33,6 +32,7 @@ public final class SerialConnection {
 	private Serial serial;
 	private boolean debug = true;
 	private byte[] writeBuffer = new byte[128];
+	private byte[] receiveBuffer;
 	// operations
 	private static final int MAX_COMMAND_SIZE = 26; // max number of bytes that
 													// can be sent in 15 ms at
@@ -69,10 +69,27 @@ public final class SerialConnection {
 		// except the 3B, it will return "/dev/ttyAMA0". For Raspberry Pi
 		// model 3B may return "/dev/ttyS0" or "/dev/ttyAMA0" depending on
 		// environment configuration.
-		config.device(SerialPort.getDefaultPort(BoardType.RaspberryPi_2B)).baud(BAUD_RATE).dataBits(DataBits._8).parity(Parity.NONE).stopBits(StopBits._1)
+		config.device(SerialPort
+				.getDefaultPort(BoardType.RaspberryPi_2B))
+				.baud(BAUD_RATE).dataBits(DataBits._8)
+				.parity(Parity.NONE).stopBits(StopBits._1)
 				.flowControl(FlowControl.NONE);
 
 		System.out.println("config = " + config);
+
+		// create and register the serial data listener
+		serial.addListener(new SerialDataEventListener() {
+
+			@Override
+			public void dataReceived(SerialDataEvent event) {
+				try {
+					receiveBytes(event.getBytes());
+				} catch (IOException e) {
+					System.out.println(e);
+				}
+
+			}
+		});
 
 		serial.open(config);
 
@@ -101,6 +118,18 @@ public final class SerialConnection {
 
 	}
 
+	private synchronized void receiveBytes(byte[] bytes) {
+		receiveBuffer = bytes;
+		System.out.print("RX: ");
+		for (int i = 0; i < bytes.length; i++) {
+			System.out.print((int) bytes[i]);
+			System.out.print(", ");
+		}
+		System.out.println();
+		System.out.println("RX: " + Arrays.toString(receiveBuffer));
+		notifyAll();
+	}
+
 	/**
 	 * Gets a default serial connection to the iRobot. This method returns after a connection between the IOIO and the
 	 * iRobot has been established.
@@ -121,7 +150,7 @@ public final class SerialConnection {
 	}
 
 	// Sends the start command to the iRobot
-	private void connectToIRobot() throws IOException {
+	private void connectToIRobot() throws IOException, InterruptedException {
 
 		// final int numberOfStartsToSend = MAX_COMMAND_SIZE;
 		final int numberOfStartsToSend = 1;
@@ -173,13 +202,20 @@ public final class SerialConnection {
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
+	 * @throws InterruptedException
 	 * 
 	 * 
 	 */
-	public int readSignedByte() throws IOException {
-		byte[] buffer = serial.read();
-		assert buffer.length == 1;
-		int result = buffer[0];
+	public synchronized int readSignedByte() throws IOException {
+
+		while (receiveBuffer == null) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+			}
+		}
+		int result = receiveBuffer[0];
+		receiveBuffer = null;
 		if (debug) {
 			System.out.println(String.format("Read signed byte: %d", result));
 		}
@@ -192,14 +228,18 @@ public final class SerialConnection {
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
+	 * @throws InterruptedException
 	 * 
 	 */
-	public int readUnsignedByte() throws IOException {
-		byte[] buffer = serial.read();
-		while (buffer.length < 1) {
-			buffer = serial.read();
+	public synchronized int readUnsignedByte() throws IOException {
+		while (receiveBuffer == null) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+			}
 		}
-		int result = buffer[0] & 0xFF;
+		int result = receiveBuffer[0] & 0xFF;
+		receiveBuffer = null;
 		if (debug) {
 			System.out.println(String.format("Read unsigned byte: %d", result));
 		}
@@ -212,12 +252,20 @@ public final class SerialConnection {
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
+	 * @throws InterruptedException
 	 * 
 	 */
-	public int readSignedWord() throws IOException {
-		byte[] buffer = serial.read();
-		assert buffer.length == 2;
-		int result = buffer[0] << 8 | buffer[1];
+	public synchronized int readSignedWord() throws IOException {
+		while (receiveBuffer == null) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+			}
+		}
+		if (receiveBuffer.length < 2)
+			return 0;
+		int result = receiveBuffer[0] << 8 | receiveBuffer[1];
+		receiveBuffer = null;
 		if (debug) {
 			System.out.println(String.format("Read signed word: %d", result));
 		}
@@ -230,14 +278,20 @@ public final class SerialConnection {
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
+	 * @throws InterruptedException
 	 * 
 	 */
-	public int readUnsignedWord() throws IOException {
-		byte[] buffer = serial.read();
-		if (buffer.length < 2) {
-			buffer = serial.read();
+	public synchronized int readUnsignedWord() throws IOException {
+		while (receiveBuffer == null) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+			}
 		}
-		int result = (buffer[0] << 8 | buffer[1]) & 0xFFFF;
+		if (receiveBuffer.length < 2)
+			return 0;
+		int result = (receiveBuffer[0] << 8 | receiveBuffer[1]) & 0xFFFF;
+		receiveBuffer = null;
 		if (debug) {
 			System.out.println(String.format("Read unsigned word = %d", result));
 		}

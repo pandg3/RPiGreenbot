@@ -5,41 +5,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A final class that provides a high level interface to the iRobot series of
- * Roomba/Create robots.
+ * A final class that provides a high level interface to the iRobot series of Roomba/Create robots.
  * <p/>
- * The names of most of the sensors are derived mostly from the <a href=
- * "https://cdn-shop.adafruit.com/datasheets/create_2_Open_Interface_Spec.pdf" >
- * iRobot Create 2 Open Interface (OI)</a>. It is recommended to read this
- * document in order to get a better understanding of how to work with the
+ * The names of most of the sensors are derived mostly from the
+ * <a href= "https://cdn-shop.adafruit.com/datasheets/create_2_Open_Interface_Spec.pdf" > iRobot Create 2 Open Interface
+ * (OI)</a>. It is recommended to read this document in order to get a better understanding of how to work with the
  * robot.
  * <p/>
- * The default constructor will not return until it has managed to connect with
- * the iRobot via the default serial interface between the computer and the
- * iRobot. This means that when the constructor returns, messages can be sent
- * and received to and from the iRobot.
+ * The default constructor will not return until it has managed to connect with the iRobot via the default serial
+ * interface between the computer and the iRobot. This means that when the constructor returns, messages can be sent and
+ * received to and from the iRobot.
  * <p/>
- * <b>NOTE:</b> This class is final; it cannot be extended. Extend
- * {@link IRobotAdapter IRobotAdapter} instead.
+ * <b>NOTE:</b> This class is final; it cannot be extended. Extend {@link IRobotAdapter IRobotAdapter} instead.
  * 
  * @author Erik Colban &copy; 2016
  */
 public final class SimpleIRobot implements IRobotInterface {
 
 	/**
-	 * This command puts the OI into Safe mode, enabling user control of iRobot.
-	 * It turns off all LEDs. The OI can be in Passive, Safe, or Full mode to
-	 * accept this command.
+	 * This command puts the OI into Safe mode, enabling user control of iRobot. It turns off all LEDs. The OI can be in
+	 * Passive, Safe, or Full mode to accept this command.
 	 * 
 	 * @see #safe()
 	 */
 	private static final int COMMAND_MODE_SAFE = 131;
 	/**
-	 * This command gives you complete control over iRobot by putting the OI
-	 * into Full mode, and turning off the cliff, wheel-drop and internal
-	 * charger safety features. That is, in Full mode, iRobot executes any
-	 * command that you send it, even if the internal charger is plugged in, or
-	 * the robot senses a cliff or wheel drop.
+	 * This command gives you complete control over iRobot by putting the OI into Full mode, and turning off the cliff,
+	 * wheel-drop and internal charger safety features. That is, in Full mode, iRobot executes any command that you send
+	 * it, even if the internal charger is plugged in, or the robot senses a cliff or wheel drop.
 	 * 
 	 * @see #full()
 	 */
@@ -49,22 +42,17 @@ public final class SimpleIRobot implements IRobotInterface {
 
 	private static final int COMMAND_STOP = 173;
 	/**
-	 * This command controls iRobot's drive wheels. It takes four data bytes,
-	 * interpreted as two 16-bit signed values using two's complement. The first
-	 * two bytes specify the average velocity of the drive wheels in millimeters
-	 * per second (mm/s), with the high byte being sent first. The next two
-	 * bytes specify the radius in millimeters at which iRobot will turn. The
-	 * longer radii make iRobot drive straighter, while the shorter radii make
-	 * iRobot turn more. The radius is measured from the center of the turning
-	 * circle to the center of iRobot. A Drive command with a positive velocity
-	 * and a positive radius makes iRobot drive forward while turning toward the
-	 * left. A negative radius makes iRobot turn toward the right. Special cases
-	 * for the radius make iRobot turn in place or drive straight, as specified
-	 * below. A negative velocity makes iRobot drive backward. <br>
-	 * NOTE: Internal and environmental restrictions may prevent iRobot from
-	 * accurately carrying out some drive commands. For example, it may not be
-	 * possible for iRobot to drive at full speed in an arc with a large radius
-	 * of curvature. <br>
+	 * This command controls iRobot's drive wheels. It takes four data bytes, interpreted as two 16-bit signed values
+	 * using two's complement. The first two bytes specify the average velocity of the drive wheels in millimeters per
+	 * second (mm/s), with the high byte being sent first. The next two bytes specify the radius in millimeters at which
+	 * iRobot will turn. The longer radii make iRobot drive straighter, while the shorter radii make iRobot turn more.
+	 * The radius is measured from the center of the turning circle to the center of iRobot. A Drive command with a
+	 * positive velocity and a positive radius makes iRobot drive forward while turning toward the left. A negative
+	 * radius makes iRobot turn toward the right. Special cases for the radius make iRobot turn in place or drive
+	 * straight, as specified below. A negative velocity makes iRobot drive backward. <br>
+	 * NOTE: Internal and environmental restrictions may prevent iRobot from accurately carrying out some drive
+	 * commands. For example, it may not be possible for iRobot to drive at full speed in an arc with a large radius of
+	 * curvature. <br>
 	 * + Available in modes: Safe or Full <br>
 	 * + Changes mode to: No Change <br>
 	 * + Velocity (-500 - 500 mm/s) <br>
@@ -78,19 +66,17 @@ public final class SimpleIRobot implements IRobotInterface {
 	 */
 	private static final int COMMAND_DRIVE = 137;
 	/**
-	 * This command controls the LEDs on iRobot. The state of LEDs is specified
-	 * by two bits in the first data byte. The power LED is specified by two
-	 * data bytes: one for the color and the other for the intensity.
+	 * This command controls the LEDs on iRobot. The state of LEDs is specified by two bits in the first data byte. The
+	 * power LED is specified by two data bytes: one for the color and the other for the intensity.
 	 * <p/>
 	 * This command shall be followed by 3 data bytes:
 	 * <p/>
 	 * <ul>
-	 * <li>LED bits, identifies the LEDS (bit 0 - Debris, bit 1 - Spot, bit 2 -
-	 * Home, bit 3 - Check Robot)</li>
-	 * <li>Power Color, (0 - 255) 0 = green, 255 = red. Intermediate values are
-	 * intermediate colors (orange, yellow, etc).</li>
-	 * <li>Power Intensity, (0 - 255) 0 = off, 255 = full intensity.
-	 * Intermediate values are intermediate intensities.</li>
+	 * <li>LED bits, identifies the LEDS (bit 0 - Debris, bit 1 - Spot, bit 2 - Home, bit 3 - Check Robot)</li>
+	 * <li>Power Color, (0 - 255) 0 = green, 255 = red. Intermediate values are intermediate colors (orange, yellow,
+	 * etc).</li>
+	 * <li>Power Intensity, (0 - 255) 0 = off, 255 = full intensity. Intermediate values are intermediate intensities.
+	 * </li>
 	 * </ul>
 	 * 
 	 * @see IRobotInterface#leds(int, int, boolean)
@@ -105,48 +91,40 @@ public final class SimpleIRobot implements IRobotInterface {
 	 */
 	private static final int SPOT_BUTTON_LED_ID = 2;
 	/**
-	 * This command lets you specify up to sixteen songs to the OI that you can
-	 * play at a later time. Each song is associated with a song number. The
-	 * Play command uses the song number to identify your song selection. Each
-	 * song can contain up to sixteen notes. Each note is associated with a note
-	 * number that uses MIDI note definitions and a duration that is specified
-	 * in fractions of a second. The number of data bytes varies, depending on
-	 * the length of the song specified. A one note song is specified by four
-	 * data bytes. For each additional note within a song, add two data bytes.
+	 * This command lets you specify up to sixteen songs to the OI that you can play at a later time. Each song is
+	 * associated with a song number. The Play command uses the song number to identify your song selection. Each song
+	 * can contain up to sixteen notes. Each note is associated with a note number that uses MIDI note definitions and a
+	 * duration that is specified in fractions of a second. The number of data bytes varies, depending on the length of
+	 * the song specified. A one note song is specified by four data bytes. For each additional note within a song, add
+	 * two data bytes.
 	 * 
 	 * @see #song(int, int[])
 	 * @see #song(int, int[], int, int)
 	 */
 	private static final int COMMAND_SONG = 140;
 	/**
-	 * This command lets you select a song to play from the songs added to
-	 * iRobot using the Song command. You must add one or more songs to iRobot
-	 * using the Song command in order for the Play command to work. Also, this
-	 * command does not work if a song is already playing. Wait until a
-	 * currently playing song is done before sending this command. Note that
-	 * {@link IRobotInterface#SENSORS_SONG_PLAYING} can be used to check whether
-	 * the iRobot is ready to accept this command.
+	 * This command lets you select a song to play from the songs added to iRobot using the Song command. You must add
+	 * one or more songs to iRobot using the Song command in order for the Play command to work. Also, this command does
+	 * not work if a song is already playing. Wait until a currently playing song is done before sending this command.
+	 * Note that {@link IRobotInterface#SENSORS_SONG_PLAYING} can be used to check whether the iRobot is ready to accept
+	 * this command.
 	 * 
 	 * @see #playSong(int)
 	 */
 	private static final int COMMAND_PLAY_SONG = 141;
 	/**
-	 * This command requests the OI to send a packet of sensor data bytes. There
-	 * are 43 different sensor data packets. Each provides a value of a specific
-	 * sensor or group of sensors.
+	 * This command requests the OI to send a packet of sensor data bytes. There are 43 different sensor data packets.
+	 * Each provides a value of a specific sensor or group of sensors.
 	 * 
 	 * @see #readSensors(int)
 	 */
 	private static final int COMMAND_SENSORS = 142;
 	/**
-	 * This command lets you control the forward and backward motion of iRobot's
-	 * drive wheels independently. It takes four data bytes, which are
-	 * interpreted as two 16-bit signed values using two's complement. The first
-	 * two bytes specify the velocity of the right wheel in millimeters per
-	 * second (mm/s), with the high byte sent first. The next two bytes specify
-	 * the velocity of the left wheel, in the same format. A positive velocity
-	 * makes that wheel drive forward, while a negative velocity makes it drive
-	 * backward. <br>
+	 * This command lets you control the forward and backward motion of iRobot's drive wheels independently. It takes
+	 * four data bytes, which are interpreted as two 16-bit signed values using two's complement. The first two bytes
+	 * specify the velocity of the right wheel in millimeters per second (mm/s), with the high byte sent first. The next
+	 * two bytes specify the velocity of the left wheel, in the same format. A positive velocity makes that wheel drive
+	 * forward, while a negative velocity makes it drive backward. <br>
 	 * + Available in modes: Safe or Full <br>
 	 * + Changes mode to: No Change <br>
 	 * + Right wheel velocity (-500 - 500 mm/s) <br>
@@ -220,8 +198,8 @@ public final class SimpleIRobot implements IRobotInterface {
 	private Map<Integer, Integer> sensorGroupHigh;
 
 	/**
-	 * Constructor that uses the IOIO instance to communicate with the iRobot.
-	 * Equivalent to using <code>SimpleIRobot(ioio, false, true, true)</code>
+	 * Constructor that uses the IOIO instance to communicate with the iRobot. Equivalent to using
+	 * <code>SimpleIRobot(ioio, false, true, true)</code>
 	 * 
 	 * @param ioio
 	 *            The IOIO instance used to communicate with the iRobot
@@ -240,8 +218,7 @@ public final class SimpleIRobot implements IRobotInterface {
 	 * @param ioio
 	 *            The IOIO instance used to communicate with the iRobot
 	 * @param debugSerial
-	 *            if true will create a default serial connection with debug
-	 *            true
+	 *            if true will create a default serial connection with debug true
 	 * @param fullMode
 	 *            if true enter full mode, otherwise enter safe mode
 	 * @param waitButton
@@ -250,14 +227,12 @@ public final class SimpleIRobot implements IRobotInterface {
 	 * @throws InterruptedException
 	 * 
 	 */
-	public SimpleIRobot(boolean debugSerial, boolean fullMode,
-			boolean waitButton) throws InterruptedException, IOException {
+	public SimpleIRobot(boolean debugSerial, boolean fullMode, boolean waitButton) throws InterruptedException, IOException {
 		this(SerialConnection.getInstance(debugSerial), fullMode, waitButton);
 	}
 
 	/**
-	 * Constructor that uses a given serial connection as its means of sending
-	 * and reading data to and from the iRobot.
+	 * Constructor that uses a given serial connection as its means of sending and reading data to and from the iRobot.
 	 * 
 	 * @param sc
 	 *            user-specified serial connection.
@@ -299,9 +274,9 @@ public final class SimpleIRobot implements IRobotInterface {
 					} catch (IOException e) {
 						System.out.println(e.getMessage());
 					}
-//					System.out.println("Spot button sensor read.");
+					// System.out.println("Spot button sensor read.");
 					if (isSpotButtonDown()) {
-//						System.out.println("Spot button down.");
+						// System.out.println("Spot button down.");
 						try {
 							stop();
 						} catch (IOException e) {
@@ -315,7 +290,7 @@ public final class SimpleIRobot implements IRobotInterface {
 		});
 		spotListener.setDaemon(true);
 		spotListener.start();
-//		System.out.println("Spot listener started.");
+		// System.out.println("Spot listener started.");
 	}
 
 	private void buildSensorGroups() {
