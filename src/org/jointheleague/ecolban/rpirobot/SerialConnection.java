@@ -30,9 +30,9 @@ public final class SerialConnection {
 	private static final int SENSOR_COMMAND = 142;
 	private static final Baud BAUD_RATE = Baud._115200;
 	private Serial serial;
-	private boolean debug = true;
+	private boolean debug = false;
 	private byte[] writeBuffer = new byte[128];
-	private byte[] receiveBuffer;
+	private BufferInterface receiveBuffer = new Buffer(128);
 	// operations
 	private static final int MAX_COMMAND_SIZE = 26; // max number of bytes that
 													// can be sent in 15 ms at
@@ -46,11 +46,6 @@ public final class SerialConnection {
 	}
 
 	static SerialConnection theConnection = new SerialConnection();
-
-	public static SerialConnection getInstance() throws IOException, InterruptedException {
-		theConnection.initialize();
-		return theConnection;
-	}
 
 	private void initialize() throws IOException, InterruptedException {
 		serial = SerialFactory.createInstance();
@@ -118,16 +113,15 @@ public final class SerialConnection {
 
 	}
 
-	private synchronized void receiveBytes(byte[] bytes) {
-		receiveBuffer = bytes;
-		System.out.print("RX: ");
-		for (int i = 0; i < bytes.length; i++) {
-			System.out.print((int) bytes[i]);
-			System.out.print(", ");
+	private void receiveBytes(byte[] bytes) {
+		if (debug)
+			System.out.println("RX: " + Arrays.toString(bytes));
+		try {
+			for (byte b : bytes) {
+				receiveBuffer.add(b);
+			}
+		} catch (InterruptedException e) {
 		}
-		System.out.println();
-		System.out.println("RX: " + Arrays.toString(receiveBuffer));
-		notifyAll();
 	}
 
 	/**
@@ -144,8 +138,8 @@ public final class SerialConnection {
 	 */
 	public static SerialConnection getInstance(boolean debug) throws InterruptedException, IOException {
 		System.out.println("Debugging = " + debug);
-		theConnection.initialize();
 		theConnection.debug = debug;
+		theConnection.initialize();
 		return theConnection;
 	}
 
@@ -206,16 +200,13 @@ public final class SerialConnection {
 	 * 
 	 * 
 	 */
-	public synchronized int readSignedByte() throws IOException {
+	public int readSignedByte() throws IOException {
 
-		while (receiveBuffer == null) {
-			try {
-				wait();
-			} catch (InterruptedException e) {
-			}
+		int result = 0;
+		try {
+			result = receiveBuffer.remove();
+		} catch (InterruptedException e) {
 		}
-		int result = receiveBuffer[0];
-		receiveBuffer = null;
 		if (debug) {
 			System.out.println(String.format("Read signed byte: %d", result));
 		}
@@ -231,15 +222,12 @@ public final class SerialConnection {
 	 * @throws InterruptedException
 	 * 
 	 */
-	public synchronized int readUnsignedByte() throws IOException {
-		while (receiveBuffer == null) {
-			try {
-				wait();
-			} catch (InterruptedException e) {
-			}
+	public int readUnsignedByte() throws IOException {
+		int result = 0;
+		try {
+			result = receiveBuffer.remove() & 0xFF;
+		} catch (InterruptedException e) {
 		}
-		int result = receiveBuffer[0] & 0xFF;
-		receiveBuffer = null;
 		if (debug) {
 			System.out.println(String.format("Read unsigned byte: %d", result));
 		}
@@ -255,17 +243,14 @@ public final class SerialConnection {
 	 * @throws InterruptedException
 	 * 
 	 */
-	public synchronized int readSignedWord() throws IOException {
-		while (receiveBuffer == null) {
-			try {
-				wait();
-			} catch (InterruptedException e) {
-			}
+	public int readSignedWord() throws IOException {
+		int result = 0;
+		try {
+			int high = receiveBuffer.remove();
+			int low = receiveBuffer.remove();
+			result = (high << 8) | (low & 0xFF);
+		} catch (InterruptedException e) {
 		}
-		if (receiveBuffer.length < 2)
-			return 0;
-		int result = receiveBuffer[0] << 8 | receiveBuffer[1];
-		receiveBuffer = null;
 		if (debug) {
 			System.out.println(String.format("Read signed word: %d", result));
 		}
@@ -281,17 +266,14 @@ public final class SerialConnection {
 	 * @throws InterruptedException
 	 * 
 	 */
-	public synchronized int readUnsignedWord() throws IOException {
-		while (receiveBuffer == null) {
-			try {
-				wait();
-			} catch (InterruptedException e) {
-			}
+	public int readUnsignedWord() throws IOException {
+		int result = 0;
+		try {
+			int high = receiveBuffer.remove();
+			int low = receiveBuffer.remove();
+			result = ((high << 8) | (low & 0xFF)) & 0xFFFF;
+		} catch (InterruptedException e) {
 		}
-		if (receiveBuffer.length < 2)
-			return 0;
-		int result = (receiveBuffer[0] << 8 | receiveBuffer[1]) & 0xFFFF;
-		receiveBuffer = null;
 		if (debug) {
 			System.out.println(String.format("Read unsigned word = %d", result));
 		}

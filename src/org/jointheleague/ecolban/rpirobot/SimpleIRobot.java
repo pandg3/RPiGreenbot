@@ -243,8 +243,7 @@ public final class SimpleIRobot implements IRobotInterface {
 	 * @throws IOException
 	 * 
 	 */
-	SimpleIRobot(SerialConnection sc, boolean fullMode, boolean waitButton)
-			throws IOException {
+	SimpleIRobot(SerialConnection sc, boolean fullMode, boolean waitButton) throws IOException {
 		this.serialConnection = sc;
 		buildSensorGroups();
 		if (fullMode) {
@@ -886,6 +885,7 @@ public final class SimpleIRobot implements IRobotInterface {
 		if (length < 1 || length > (256 - (songNumber * 16 * 2))) {
 			throw new IllegalArgumentException("length " + length);
 		}
+		System.out.println("Writing song to Roomba");
 		serialConnection.writeByte(COMMAND_SONG);
 		serialConnection.writeByte(songNumber);
 		serialConnection.writeByte(length >> 1);
@@ -926,6 +926,7 @@ public final class SimpleIRobot implements IRobotInterface {
 					cleanButtonPressed = true;
 				}
 				if (totalTimeWaiting > 500) {
+					System.out.println("Checking beep: " + beep);
 					if (beep) {
 						playSong(0);
 					}
