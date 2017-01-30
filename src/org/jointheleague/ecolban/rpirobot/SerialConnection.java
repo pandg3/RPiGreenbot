@@ -17,8 +17,10 @@ import com.pi4j.io.serial.StopBits;
 import com.pi4j.system.SystemInfo.BoardType;
 
 /**
- * This class represents the communication channel between the computer (e.g., Raspberry Pi) and the iRobot. At most one
- * instance of this class may be instantiated. Use the {@link #getInstance(boolean) } method to get that instance.
+ * This class represents the communication channel between the computer (e.g.,
+ * Raspberry Pi) and the iRobot. At most one instance of this class may be
+ * instantiated. Use the {@link #getInstance(boolean) } method to get that
+ * instance.
  * 
  * @author Erik Colban &copy; 2016
  * 
@@ -64,11 +66,8 @@ public final class SerialConnection {
 		// except the 3B, it will return "/dev/ttyAMA0". For Raspberry Pi
 		// model 3B may return "/dev/ttyS0" or "/dev/ttyAMA0" depending on
 		// environment configuration.
-		config.device(SerialPort
-				.getDefaultPort(BoardType.RaspberryPi_2B))
-				.baud(BAUD_RATE).dataBits(DataBits._8)
-				.parity(Parity.NONE).stopBits(StopBits._1)
-				.flowControl(FlowControl.NONE);
+		config.device(SerialPort.getDefaultPort(BoardType.RaspberryPi_2B)).baud(BAUD_RATE).dataBits(DataBits._8)
+				.parity(Parity.NONE).stopBits(StopBits._1).flowControl(FlowControl.NONE);
 
 		System.out.println("config = " + config);
 
@@ -125,13 +124,14 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Gets a default serial connection to the iRobot. This method returns after a connection between the IOIO and the
-	 * iRobot has been established.
+	 * Gets a default serial connection to the iRobot. This method returns after
+	 * a connection between the IOIO and the iRobot has been established.
 	 * 
 	 * @param ioio
 	 *            the ioio instance used to connect to the iRobot
 	 * @param debug
-	 *            if true establishes a connection that prints out debugging information.
+	 *            if true establishes a connection that prints out debugging
+	 *            information.
 	 * @return a serial connection to the iRobot
 	 * @throws InterruptedException
 	 * @throws IOException
@@ -172,7 +172,8 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * The maximum number of bytes that can be transmitted in a command to the iRobot
+	 * The maximum number of bytes that can be transmitted in a command to the
+	 * iRobot
 	 * 
 	 * @return the max size in bytes
 	 */
@@ -191,8 +192,8 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Reads a byte received from the iRobot over the serial connection and interprets it as a signed byte, i.e., value
-	 * is in the range -128 - 127.
+	 * Reads a byte received from the iRobot over the serial connection and
+	 * interprets it as a signed byte, i.e., value is in the range -128 - 127.
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
@@ -214,8 +215,8 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Reads a byte received from the iRobot over the serial connection and interprets it as an unsigned byte, i.e.,
-	 * value is in range 0 - 255.
+	 * Reads a byte received from the iRobot over the serial connection and
+	 * interprets it as an unsigned byte, i.e., value is in range 0 - 255.
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
@@ -235,8 +236,8 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Reads 2 bytes received from the iRobot over the serial connection and interprets them as a signed word, i.e.,
-	 * value is in range -32768 - 32767.
+	 * Reads 2 bytes received from the iRobot over the serial connection and
+	 * interprets them as a signed word, i.e., value is in range -32768 - 32767.
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
@@ -258,8 +259,8 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Reads 2 bytes received from the iRobot over the serial connection and interprets them as an unsigned word, i.e.,
-	 * value is in range 0 - 65535.
+	 * Reads 2 bytes received from the iRobot over the serial connection and
+	 * interprets them as an unsigned word, i.e., value is in range 0 - 65535.
 	 * 
 	 * @return the value as an int
 	 * @throws IOException
@@ -309,17 +310,17 @@ public final class SerialConnection {
 	 */
 	public void writeBytes(int[] ints, int start, int length) throws IOException {
 		if (debug) {
-			System.out.println(String.format("Sending bytes byte[] length: %d", length));
-			for (int i = 0; i < length; i++) {
-				System.out.println(String.format("[%d] = %d", i, ints[start + i]));
-				writeBuffer[i] = (byte) ints[start + i];
-			}
+			System.out.println(String.format("start = %d length = %d ints = %s",  start, length, Arrays.toString(ints)));
+		}
+		for (int i = 0; i < length; i++) {
+			writeBuffer[i] = (byte) ints[start + i];
 		}
 		serial.write(writeBuffer, 0, length);
 	}
 
 	/**
-	 * Sends a signed word to the iRobot over the serial connection as two bytes, high byte first.
+	 * Sends a signed word to the iRobot over the serial connection as two
+	 * bytes, high byte first.
 	 * 
 	 * @param value
 	 *            an int in the range -32768 - 32767.
@@ -337,7 +338,8 @@ public final class SerialConnection {
 	}
 
 	/**
-	 * Sends an unsigned word to the iRobot over the serial connection as two bytes, high byte first.
+	 * Sends an unsigned word to the iRobot over the serial connection as two
+	 * bytes, high byte first.
 	 * 
 	 * @param value
 	 *            an int in the range 0 - 65535.
