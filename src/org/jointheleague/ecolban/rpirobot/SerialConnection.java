@@ -14,7 +14,6 @@ import com.pi4j.io.serial.SerialDataEventListener;
 import com.pi4j.io.serial.SerialFactory;
 import com.pi4j.io.serial.SerialPort;
 import com.pi4j.io.serial.StopBits;
-import com.pi4j.system.SystemInfo.BoardType;
 
 /**
  * This class represents the communication channel between the computer (e.g.,
@@ -66,8 +65,8 @@ public final class SerialConnection {
 		// except the 3B, it will return "/dev/ttyAMA0". For Raspberry Pi
 		// model 3B may return "/dev/ttyS0" or "/dev/ttyAMA0" depending on
 		// environment configuration.
-		config.device(SerialPort.getDefaultPort(BoardType.RaspberryPi_2B)).baud(BAUD_RATE).dataBits(DataBits._8)
-				.parity(Parity.NONE).stopBits(StopBits._1).flowControl(FlowControl.NONE);
+		config.device(SerialPort.getDefaultPort()).baud(BAUD_RATE).dataBits(DataBits._8).parity(Parity.NONE)
+				.stopBits(StopBits._1).flowControl(FlowControl.NONE);
 
 		System.out.println("config = " + config);
 
@@ -310,7 +309,7 @@ public final class SerialConnection {
 	 */
 	public void writeBytes(int[] ints, int start, int length) throws IOException {
 		if (debug) {
-			System.out.println(String.format("start = %d length = %d ints = %s",  start, length, Arrays.toString(ints)));
+			System.out.println(String.format("start = %d length = %d ints = %s", start, length, Arrays.toString(ints)));
 		}
 		for (int i = 0; i < length; i++) {
 			writeBuffer[i] = (byte) ints[start + i];
