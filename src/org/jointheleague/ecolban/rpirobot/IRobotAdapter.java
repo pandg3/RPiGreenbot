@@ -347,4 +347,10 @@ public class IRobotAdapter implements IRobotInterface {
 	public void setTailLight(boolean on) throws IOException {
 		delegate.setTailLight(on);
 	}
+
+	@Override
+	public void drivePWM(int leftPWM, int rightPWM) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 }

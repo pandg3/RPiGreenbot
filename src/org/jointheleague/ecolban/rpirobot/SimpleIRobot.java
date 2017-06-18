@@ -157,6 +157,9 @@ public final class SimpleIRobot implements IRobotInterface {
 	 * 
 	 * @see #readSensors(int)
 	 */
+	
+	 private static final int COMMAND_DRIVE_PWM = 146;
+	 
 	private static final int COMMAND_SENSORS = 142;
 	/**
 	 * This command lets you control the forward and backward motion of iRobot's
@@ -449,6 +452,14 @@ public final class SimpleIRobot implements IRobotInterface {
 	public int getEncoderCountLeft() {
 		return encoderCountLeft;
 	}
+	
+	@Override
+    public void drivePWM(int leftPWM, int rightPWM) throws Exception {
+        serialConnection.writeByte(COMMAND_DRIVE_PWM);
+        serialConnection.writeSignedWord(rightPWM);
+        serialConnection.writeSignedWord(leftPWM);
+        Thread.sleep(AFTER_COMMAND_PAUSE_TIME);
+    }
 
 	@Override
 	public int getEncoderCountRight() {
