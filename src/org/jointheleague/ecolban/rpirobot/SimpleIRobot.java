@@ -157,8 +157,7 @@ public final class SimpleIRobot implements IRobotInterface {
 	 * 
 	 * @see #readSensors(int)
 	 */
-	
-	 private static final int COMMAND_DRIVE_PWM = 146;
+
 	 
 	private static final int COMMAND_SENSORS = 142;
 	/**
@@ -178,6 +177,8 @@ public final class SimpleIRobot implements IRobotInterface {
 	 * @see #driveDirect(int, int)
 	 */
 	private static final int COMMAND_DRIVE_DIRECT = 145;
+	
+	private static final int COMMAND_DRIVE_PWM = 146;
 	/**
 	 * Time in ms to pause after sending a command to the iRobot.
 	 */
@@ -383,7 +384,18 @@ public final class SimpleIRobot implements IRobotInterface {
 		} catch (InterruptedException e) {
 		}
 	}
-
+	
+	@Override
+    public void drivePWM(int leftPWM, int rightPWM) throws IOException {
+        serialConnection.writeByte(COMMAND_DRIVE_PWM);
+        serialConnection.writeSignedWord(rightPWM);
+        serialConnection.writeSignedWord(leftPWM);
+        try {
+			Thread.sleep(AFTER_COMMAND_PAUSE_TIME);
+		} catch (InterruptedException e) {
+		}
+	}
+	
 	@Override
 	public synchronized void full() throws IOException {
 		serialConnection.writeByte(COMMAND_MODE_FULL);
@@ -453,13 +465,7 @@ public final class SimpleIRobot implements IRobotInterface {
 		return encoderCountLeft;
 	}
 	
-	@Override
-    public void drivePWM(int leftPWM, int rightPWM) throws Exception {
-        serialConnection.writeByte(COMMAND_DRIVE_PWM);
-        serialConnection.writeSignedWord(rightPWM);
-        serialConnection.writeSignedWord(leftPWM);
-        Thread.sleep(AFTER_COMMAND_PAUSE_TIME);
-    }
+	
 
 	@Override
 	public int getEncoderCountRight() {

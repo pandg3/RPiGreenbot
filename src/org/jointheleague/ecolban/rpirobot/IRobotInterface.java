@@ -1507,6 +1507,6 @@ public interface IRobotInterface {
 	 */
 	void closeConnection();
 
-	void drivePWM(int leftPWM, int rightPWM) throws Exception;
+	void drivePWM(int leftPWM, int rightPWM) throws IOException;
 
 }

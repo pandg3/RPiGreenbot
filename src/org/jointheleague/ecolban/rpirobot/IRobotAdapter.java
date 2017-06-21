@@ -41,6 +41,12 @@ public class IRobotAdapter implements IRobotInterface {
 	public void driveDirect(int leftVelocity, int rightVelocity) throws IOException {
 		delegate.driveDirect(leftVelocity, rightVelocity);
 	}
+	
+	@Override
+	public void drivePWM(int leftPWM, int rightPWM) throws IOException {
+		delegate.drivePWM(leftPWM, rightPWM);
+		
+	}
 
 	@Override
 	public void full() throws IOException {
@@ -348,9 +354,5 @@ public class IRobotAdapter implements IRobotInterface {
 		delegate.setTailLight(on);
 	}
 
-	@Override
-	public void drivePWM(int leftPWM, int rightPWM) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }
